@@ -18,6 +18,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
+import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.utils.LuceneConstants;
 
 public class QueryService {
@@ -32,6 +33,43 @@ public class QueryService {
 		index = FSDirectory.open(indexDirectory.toPath());
 	}
 
+	public QueryResults query(String queryString) {
+		QueryResults results = new QueryResults();
+
+		try {
+			long start = System.currentTimeMillis();
+
+			Query q = new QueryParser("content", analyzer).parse(queryString);
+
+			int hitsPerPage = 9999;
+			IndexReader reader = DirectoryReader.open(index);
+			IndexSearcher searcher = new IndexSearcher(reader);
+			TopDocs docs = searcher.search(q, hitsPerPage);
+
+			long finish = System.currentTimeMillis();
+
+			results.setQueryTime(finish - start);
+
+			ScoreDoc[] hits = docs.scoreDocs;
+
+			results.setHits(hits.length);
+
+			for (int i = 0; i < hits.length; ++i) {
+				int docId = hits[i].doc;
+				Document d = searcher.doc(docId);
+				results.getResultsMap().put(d.get("title"), docId);
+			}
+
+		} catch (ParseException e) {
+			log.error("Error Parsing Query String", e);
+		} catch (IOException e) {
+			log.error("Error Reading from Index Directory", e);
+		}
+
+		return results;
+	}
+
+	@Deprecated
 	public void run() throws ParseException, IOException {
 		System.out.println("Enter your query: ");
 
