@@ -94,10 +94,12 @@ public class IndexerService {
 		String[] splitDocs = text.split(".I");
 
 		for (String doc : splitDocs) {
-			EntryDocument newEntry = new EntryDocument(doc);
-
-			if (newEntry != null)
-				texts.add(newEntry);
+			if (doc != null && !doc.isEmpty()) {
+				EntryDocument newEntry = EntryDocument.buildEntry(doc);
+				if(newEntry != null){
+					texts.add(newEntry);
+				}
+			}
 		}
 
 		return texts;

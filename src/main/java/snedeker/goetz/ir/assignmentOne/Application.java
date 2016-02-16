@@ -3,6 +3,8 @@ package snedeker.goetz.ir.assignmentOne;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.services.IndexerService;
 import snedeker.goetz.ir.assignmentOne.services.QueryService;
@@ -10,6 +12,8 @@ import snedeker.goetz.ir.assignmentOne.utils.LuceneConstants;
 import snedeker.goetz.ir.assignmentOne.utils.Metrics;
 
 public class Application {
+
+	static Logger log = Logger.getLogger(Application.class);
 
 	private IndexerService indexerService;
 	private QueryService queryService;
@@ -20,6 +24,19 @@ public class Application {
 	public Application() throws IOException {
 		indexerService = new IndexerService();
 		queryService = new QueryService();
+	}
+
+	public static void main(String[] args) throws IOException {
+		// Create Index
+		log.debug("Creating Index...");
+		Application testApplication = new Application();
+		testApplication.createIndex();
+		log.debug("Index Created.");
+		// Obtain Index Metrics
+		int size = Metrics.getFolderSizeOnDisk(new File(testApplication.getIndexPath()));
+		log.debug("Index currently residing within " + size + " bytes on disk.");
+
+		// FIXME continue coding here
 	}
 
 	public void createIndex() throws IOException {

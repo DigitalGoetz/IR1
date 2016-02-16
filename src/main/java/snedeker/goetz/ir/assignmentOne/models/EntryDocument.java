@@ -1,42 +1,55 @@
 package snedeker.goetz.ir.assignmentOne.models;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 public class EntryDocument {
+
+	static Logger log = Logger.getLogger(EntryDocument.class);
+
 	private Integer docId;
 	private String title;
 	private String contents;
 	private String author;
 	private String additional;
 
-	public EntryDocument(String documentString) {
-		String[] docs = documentString.split(".I");
+	public static EntryDocument buildEntry(String documentString) {
+		EntryDocument document = new EntryDocument();
 
-		String doc;
-		if (docs.length > 0) {
-			doc = docs[1];
-		} else {
-			doc = docs[0];
+		try {
+			String[] docs = documentString.split(".I");
+
+			String doc;
+			if (docs.length > 1) {
+				doc = docs[1];
+			} else {
+				doc = docs[0];
+			}
+
+			// Get ID
+			String[] docId = doc.split(".T");
+			document.setDocId(Integer.parseInt(StringUtils.trim(docId[0])));
+
+			// get title
+			String[] title = docId[1].split(".A");
+			document.setTitle(StringUtils.trim(title[0]));
+
+			// get author
+			String[] author = title[1].split(".B");
+			document.setAuthor(StringUtils.trim(author[0]));
+
+			// get additional
+			String[] additional = author[1].split(".W");
+			document.setAdditional(StringUtils.trim(additional[0]));
+
+			// get contents
+			document.setContents(StringUtils.trim(additional[1]));
+		} catch (Exception e) {
+			log.error("Error building EntryDocument", e);
+			document = null;
 		}
 
-		// Get ID
-		String[] docId = doc.split(".T");
-		setDocId(Integer.parseInt(StringUtils.trim(docId[0])));
-
-		// get title
-		String[] title = docId[1].split(".A");
-		setTitle(StringUtils.trim(title[0]));
-
-		// get author
-		String[] author = title[1].split(".B");
-		setAuthor(StringUtils.trim(author[0]));
-
-		// get additional
-		String[] additional = author[1].split(".W");
-		setAdditional(StringUtils.trim(additional[0]));
-
-		// get contents
-		setContents(StringUtils.trim(additional[1]));
+		return document;
 	}
 
 	public String getAdditional() {

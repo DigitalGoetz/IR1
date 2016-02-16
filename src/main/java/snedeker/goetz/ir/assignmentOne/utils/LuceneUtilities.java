@@ -23,9 +23,11 @@ public class LuceneUtilities {
 			for (File file : directory.listFiles()) {
 				if (file.isFile()) {
 					String docString = FileUtils.readFileToString(file);
-					EntryDocument doc = new EntryDocument(docString);
+					EntryDocument doc = EntryDocument.buildEntry(docString);
 					// TODO place query logic here
-					results.add(doc);
+					if (doc != null) {
+						results.add(doc);
+					}
 				}
 			}
 		}
