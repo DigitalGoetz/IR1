@@ -1,9 +1,12 @@
 package snedeker.goetz.ir.assignmentOne;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 
 import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.services.IndexerService;
@@ -26,26 +29,38 @@ public class Application {
 		queryService = new QueryService();
 	}
 
-	public static void main(String[] args) throws IOException {
-		// Create Index
-		log.debug("Creating Index...");
-		Application testApplication = new Application();
-		testApplication.createIndex();
-		log.debug("Index Created.");
-		// Obtain Index Metrics
-		int size = Metrics.getFolderSizeOnDisk(new File(testApplication.getIndexPath()));
-		log.debug("Index currently residing within " + size + " bytes on disk.");
-
-		// FIXME continue coding here
+	public void setAnalyzer(Analyzer analyzer) {
+		indexerService.setAnalyzer(analyzer);
+		queryService.setAnalyzer(analyzer);
 	}
 
 	public void createIndex() throws IOException {
-		indexerService.run();
+		indexerService.createIndex(fileStore);
 		setIndexSize(Metrics.getFolderSizeOnDisk(new File(indexPath)));
 	}
 
 	public QueryResults performQuery(String query) {
 		return queryService.query(query);
+	}
+
+	public String retrieveDocument(Integer documentId) throws FileNotFoundException, IOException {
+
+		log.debug("Retriving document with ID = " + documentId);
+
+		long start = System.currentTimeMillis();
+		File file = new File(getFileStore() + File.separator + documentId.toString());
+
+		if (!file.exists()) {
+			throw new FileNotFoundException("Could not retrieve the requested Document");
+		}
+
+		String document = FileUtils.readFileToString(file);
+		long finish = System.currentTimeMillis();
+
+		log.debug("Document Retrieved in " + (finish - start) + "ms.");
+
+		return document;
+
 	}
 
 	public int getIndexSize() {

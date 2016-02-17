@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -30,12 +31,13 @@ import org.apache.lucene.util.BytesRef;
 
 import snedeker.goetz.ir.assignmentOne.models.EntryDocument;
 import snedeker.goetz.ir.assignmentOne.utils.LuceneConstants;
-import snedeker.goetz.ir.assignmentOne.utils.Metrics;
+import snedeker.goetz.ir.assignmentOne.utils.LuceneUtilities;
 
 public class IndexerService {
 
 	Logger log = Logger.getLogger(getClass());
-	private StandardAnalyzer analyzer;
+	Analyzer analyzer = new StandardAnalyzer();
+	String fileStorePath;
 	Directory index;
 
 	public IndexerService() throws IOException {
@@ -48,11 +50,19 @@ public class IndexerService {
 
 		Path path = indexDirectory.toPath();
 		log.debug("Creating Index Directory at: " + path.toString());
-		analyzer = new StandardAnalyzer();
 		index = FSDirectory.open(path);
 	}
 
-	public void run() throws IOException {
+	public Analyzer getAnalyzer() {
+		return analyzer;
+	}
+
+	public void setAnalyzer(Analyzer analyzer) {
+		this.analyzer = analyzer;
+	}
+
+	public void createIndex(String fileStore) throws IOException {
+		setFileStorePath(fileStore);
 		Map<String, Long> postings = new HashMap<>();
 
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -80,7 +90,7 @@ public class IndexerService {
 			}
 		}
 
-		Metrics.printIndexTerms(postings);
+		// Metrics.printIndexTerms(postings);
 
 	}
 
@@ -96,7 +106,8 @@ public class IndexerService {
 		for (String doc : splitDocs) {
 			if (doc != null && !doc.isEmpty()) {
 				EntryDocument newEntry = EntryDocument.buildEntry(doc);
-				if(newEntry != null){
+				if (newEntry != null) {
+					LuceneUtilities.entryToFile(getFileStorePath(), newEntry);
 					texts.add(newEntry);
 				}
 			}
@@ -113,5 +124,13 @@ public class IndexerService {
 		doc.add(new TextField("author", entry.getAuthor(), Field.Store.YES));
 		doc.add(new TextField("additional", entry.getAdditional(), Field.Store.YES));
 		w.addDocument(doc);
+	}
+
+	public String getFileStorePath() {
+		return fileStorePath;
+	}
+
+	public void setFileStorePath(String fileStorePath) {
+		this.fileStorePath = fileStorePath;
 	}
 }

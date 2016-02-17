@@ -2,9 +2,9 @@ package snedeker.goetz.ir.assignmentOne.services;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
 
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -24,12 +24,11 @@ import snedeker.goetz.ir.assignmentOne.utils.LuceneConstants;
 public class QueryService {
 
 	Logger log = Logger.getLogger(getClass());
-	private StandardAnalyzer analyzer;
+	Analyzer analyzer = new StandardAnalyzer();
 	Directory index;
 
 	public QueryService() throws IOException {
 		File indexDirectory = new File(LuceneConstants.INDEX_PATH);
-		analyzer = new StandardAnalyzer();
 		index = FSDirectory.open(indexDirectory.toPath());
 	}
 
@@ -69,39 +68,11 @@ public class QueryService {
 		return results;
 	}
 
-	@Deprecated
-	public void run() throws ParseException, IOException {
-		System.out.println("Enter your query: ");
+	public Analyzer getAnalyzer() {
+		return analyzer;
+	}
 
-		try (Scanner scanner = new Scanner(System.in)) {
-
-			while (scanner.hasNext()) {
-				String queryString = scanner.nextLine();
-				System.out.println("Your query is " + queryString);
-
-				long start = System.currentTimeMillis();
-
-				Query q = new QueryParser("content", analyzer).parse(queryString);
-
-				int hitsPerPage = 9999;
-				IndexReader reader = DirectoryReader.open(index);
-				IndexSearcher searcher = new IndexSearcher(reader);
-				TopDocs docs = searcher.search(q, hitsPerPage);
-
-				long finish = System.currentTimeMillis();
-
-				log.debug("Query Completed in " + (finish - start) + " milliseconds");
-
-				ScoreDoc[] hits = docs.scoreDocs;
-
-				System.out.println("Found " + hits.length + " hits\n");
-				for (int i = 0; i < hits.length; ++i) {
-					int docId = hits[i].doc;
-					Document d = searcher.doc(docId);
-					System.out.println((i + 1) + ". " + d.get("title"));
-				}
-				System.out.println();
-			}
-		}
+	public void setAnalyzer(Analyzer analyzer) {
+		this.analyzer = analyzer;
 	}
 }
