@@ -30,7 +30,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
 import snedeker.goetz.ir.assignmentOne.models.EntryDocument;
-import snedeker.goetz.ir.assignmentOne.utils.LuceneConstants;
 import snedeker.goetz.ir.assignmentOne.utils.LuceneUtilities;
 
 public class IndexerService {
@@ -39,18 +38,10 @@ public class IndexerService {
 	Analyzer analyzer = new StandardAnalyzer();
 	String fileStorePath;
 	Directory index;
+	String type;
 
-	public IndexerService() throws IOException {
-		File indexDirectory = new File(LuceneConstants.INDEX_PATH);
-
-		if (indexDirectory.exists()) {
-			log.debug("Index Directory exists.  Clearing directory...");
-			FileUtils.deleteDirectory(indexDirectory);
-		}
-
-		Path path = indexDirectory.toPath();
-		log.debug("Creating Index Directory at: " + path.toString());
-		index = FSDirectory.open(path);
+	public IndexerService(String type) {
+		this.type = type;
 	}
 
 	public Analyzer getAnalyzer() {
@@ -61,8 +52,19 @@ public class IndexerService {
 		this.analyzer = analyzer;
 	}
 
-	public void createIndex(String fileStore) throws IOException {
-		setFileStorePath(fileStore);
+	public void createIndex() throws IOException {
+		File indexDirectory = new File(type + File.separator + "index");
+
+		if (indexDirectory.exists()) {
+			log.debug("Index Directory exists.  Clearing directory...");
+			FileUtils.deleteDirectory(indexDirectory);
+		}
+
+		Path path = indexDirectory.toPath();
+		log.debug("Creating Index Directory at: " + path.toString());
+		index = FSDirectory.open(path);
+
+		setFileStorePath(type + File.separator + "documents");
 		Map<String, Long> postings = new HashMap<>();
 
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);

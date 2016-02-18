@@ -11,22 +11,22 @@ import org.apache.lucene.analysis.Analyzer;
 import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.services.IndexerService;
 import snedeker.goetz.ir.assignmentOne.services.QueryService;
-import snedeker.goetz.ir.assignmentOne.utils.LuceneConstants;
 import snedeker.goetz.ir.assignmentOne.utils.Metrics;
 
-public class Application {
+public class SearchAppliance {
 
-	static Logger log = Logger.getLogger(Application.class);
+	static Logger log = Logger.getLogger(SearchAppliance.class);
 
 	private IndexerService indexerService;
 	private QueryService queryService;
 	private int indexSize = 0;
-	private String indexPath = LuceneConstants.INDEX_PATH;
-	private String fileStore = "temp";
+	private String indexPath = "index";
+	private String type;
 
-	public Application() throws IOException {
-		indexerService = new IndexerService();
-		queryService = new QueryService();
+	public SearchAppliance(String type) throws IOException {
+		this.type = type;
+		indexerService = new IndexerService(type);
+		queryService = new QueryService(type);
 	}
 
 	public void setAnalyzer(Analyzer analyzer) {
@@ -35,11 +35,11 @@ public class Application {
 	}
 
 	public void createIndex() throws IOException {
-		indexerService.createIndex(fileStore);
+		indexerService.createIndex();
 		setIndexSize(Metrics.getFolderSizeOnDisk(new File(indexPath)));
 	}
 
-	public QueryResults performQuery(String query) {
+	public QueryResults performQuery(String query) throws IOException {
 		return queryService.query(query);
 	}
 
@@ -48,7 +48,7 @@ public class Application {
 		log.debug("Retriving document with ID = " + documentId);
 
 		long start = System.currentTimeMillis();
-		File file = new File(getFileStore() + File.separator + documentId.toString());
+		File file = new File(type + "documents" + File.separator + documentId.toString());
 
 		if (!file.exists()) {
 			throw new FileNotFoundException("Could not retrieve the requested Document");
@@ -79,11 +79,12 @@ public class Application {
 		this.indexPath = indexPath;
 	}
 
-	public String getFileStore() {
-		return fileStore;
+	public String getType() {
+		return type;
 	}
 
-	public void setFileStore(String fileStore) {
-		this.fileStore = fileStore;
+	public String getFileStore() {
+		return type + File.separator + "documents";
 	}
+
 }

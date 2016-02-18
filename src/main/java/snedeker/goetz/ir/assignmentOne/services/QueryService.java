@@ -19,21 +19,22 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
 import snedeker.goetz.ir.assignmentOne.models.QueryResults;
-import snedeker.goetz.ir.assignmentOne.utils.LuceneConstants;
 
 public class QueryService {
 
 	Logger log = Logger.getLogger(getClass());
 	Analyzer analyzer = new StandardAnalyzer();
+	String type;
 	Directory index;
 
-	public QueryService() throws IOException {
-		File indexDirectory = new File(LuceneConstants.INDEX_PATH);
-		index = FSDirectory.open(indexDirectory.toPath());
+	public QueryService(String type) {
+		this.type = type;
 	}
 
-	public QueryResults query(String queryString) {
+	public QueryResults query(String queryString) throws IOException {
 		QueryResults results = new QueryResults();
+		File indexDirectory = new File(type + File.separator + "index");
+		index = FSDirectory.open(indexDirectory.toPath());
 
 		try {
 			long start = System.currentTimeMillis();
