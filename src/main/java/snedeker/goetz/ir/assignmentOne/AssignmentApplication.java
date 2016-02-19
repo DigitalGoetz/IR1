@@ -22,10 +22,12 @@ public class AssignmentApplication {
 	static LuceneResults resultSet = new LuceneResults();
 
 	private static void clean(SearchAppliance app) throws IOException {
+		FileUtils.deleteDirectory(new File(app.getType() + File.separator + "index"));
+		FileUtils.deleteDirectory(new File(app.getType() + File.separator + "documents"));
 		FileUtils.deleteDirectory(new File(app.getType()));
 	}
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 
 		SearchAppliance standardAnalyzerSearch = new SearchAppliance(STD_ANALYZER);
 		createIndex(standardAnalyzerSearch);
@@ -40,6 +42,8 @@ public class AssignmentApplication {
 
 		resultSet.printEvaluation();
 
+		Thread.sleep(2000);
+		
 		clean(standardAnalyzerSearch);
 		clean(englishAnalyzerSearch);
 
@@ -53,7 +57,10 @@ public class AssignmentApplication {
 			log.debug("Query obtained " + results.getHits() + " results");
 			log.debug("\n");
 			if (results.getHits() > 0) {
+				log.debug("Hits found for " + query);
 				resultSet.insertData(app.getType(), query, results.getQueryTime());
+			}else{
+				log.debug("Not hits found for " + query);
 			}
 
 		}

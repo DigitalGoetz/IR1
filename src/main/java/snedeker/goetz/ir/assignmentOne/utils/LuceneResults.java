@@ -29,10 +29,10 @@ public class LuceneResults {
 
 		if (list == null || list.isEmpty()) {
 			list = new ArrayList<>();
-			list.add(new ResultData(type, duration));
+			list.add(new ResultData(type, duration, true));
 			evaluations.put(query, list);
 		} else {
-			list.add(new ResultData(type, duration));
+			list.add(new ResultData(type, duration, true));
 		}
 
 	}

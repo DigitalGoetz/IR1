@@ -13,9 +13,10 @@ public class ResultData {
 		this.foundHits = foundHits;
 	}
 
-	public ResultData(String type, Long time) {
+	public ResultData(String type, Long time, boolean foundHits) {
 		this.type = type;
 		this.time = time;
+		this.foundHits = foundHits;
 	}
 
 	public String getType() {
