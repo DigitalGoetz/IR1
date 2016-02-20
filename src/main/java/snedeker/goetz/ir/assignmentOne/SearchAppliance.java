@@ -48,7 +48,9 @@ public class SearchAppliance {
 		log.debug("Retriving document with ID = " + documentId);
 
 		long start = System.currentTimeMillis();
-		File file = new File(type + "documents" + File.separator + documentId.toString());
+		File file = new File(type + File.separator + "documents" + File.separator + documentId.toString());
+
+		log.debug(file.getAbsolutePath().toString());
 
 		if (!file.exists()) {
 			throw new FileNotFoundException("Could not retrieve the requested Document");

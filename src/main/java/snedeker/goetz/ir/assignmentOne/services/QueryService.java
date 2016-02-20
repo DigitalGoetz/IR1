@@ -39,29 +39,39 @@ public class QueryService {
 		try {
 			long start = System.currentTimeMillis();
 
-			Query q = new QueryParser("content", analyzer).parse(queryString);
+			Query q = null;
 
-			int hitsPerPage = 9999;
-			IndexReader reader = DirectoryReader.open(index);
-			IndexSearcher searcher = new IndexSearcher(reader);
-			TopDocs docs = searcher.search(q, hitsPerPage);
-
-			long finish = System.currentTimeMillis();
-
-			results.setQueryTime(finish - start);
-
-			ScoreDoc[] hits = docs.scoreDocs;
-
-			results.setHits(hits.length);
-
-			for (int i = 0; i < hits.length; ++i) {
-				int docId = hits[i].doc;
-				Document d = searcher.doc(docId);
-				results.getResultsMap().put(d.get("title"), docId);
+			try {
+				q = new QueryParser("content", analyzer).parse(queryString);
+			} catch (ParseException e) {
+				log.debug("Error parsing: " + queryString, e);
 			}
 
-		} catch (ParseException e) {
-			log.error("Error Parsing Query String", e);
+			if (q != null) {
+				int hitsPerPage = 9999;
+				IndexReader reader = DirectoryReader.open(index);
+				IndexSearcher searcher = new IndexSearcher(reader);
+				TopDocs docs = searcher.search(q, hitsPerPage);
+
+				long finish = System.currentTimeMillis();
+
+				results.setQueryTime(finish - start);
+
+				ScoreDoc[] hits = docs.scoreDocs;
+
+				results.setHits(hits.length);
+
+				for (int i = 0; i < hits.length; ++i) {
+					int docId = hits[i].doc;
+
+					if (docId != 0) {
+						Document d = searcher.doc(docId);
+						results.getResultsMap().put(docId, d.get("title"));
+					}
+
+				}
+			}
+
 		} catch (IOException e) {
 			log.error("Error Reading from Index Directory", e);
 		}

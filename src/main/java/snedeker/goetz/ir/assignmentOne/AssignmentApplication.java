@@ -21,7 +21,7 @@ public class AssignmentApplication {
 
 	static LuceneResults resultSet = new LuceneResults();
 
-	private static void clean(SearchAppliance app) throws IOException {
+	static void clean(SearchAppliance app) throws IOException {
 		FileUtils.deleteDirectory(new File(app.getType() + File.separator + "index"));
 		FileUtils.deleteDirectory(new File(app.getType() + File.separator + "documents"));
 		FileUtils.deleteDirectory(new File(app.getType()));
@@ -30,11 +30,16 @@ public class AssignmentApplication {
 	public static void main(String[] args) throws IOException, InterruptedException {
 
 		SearchAppliance standardAnalyzerSearch = new SearchAppliance(STD_ANALYZER);
+		clean(standardAnalyzerSearch);
 		createIndex(standardAnalyzerSearch);
 		indexMetrics(standardAnalyzerSearch);
 		performQueries(standardAnalyzerSearch);
 
+		String retrieveDocument = standardAnalyzerSearch.retrieveDocument(1);
+		log.debug(retrieveDocument);
+
 		SearchAppliance englishAnalyzerSearch = new SearchAppliance(ENG_ANALYZER);
+		clean(englishAnalyzerSearch);
 		englishAnalyzerSearch.setAnalyzer(new EnglishAnalyzer());
 		createIndex(englishAnalyzerSearch);
 		indexMetrics(englishAnalyzerSearch);
@@ -42,14 +47,9 @@ public class AssignmentApplication {
 
 		resultSet.printEvaluation();
 
-		Thread.sleep(2000);
-		
-		clean(standardAnalyzerSearch);
-		clean(englishAnalyzerSearch);
-
 	}
 
-	private static void performQueries(SearchAppliance app) throws IOException {
+	static void performQueries(SearchAppliance app) throws IOException {
 		for (String query : queries) {
 			QueryResults results = app.performQuery(query);
 			log.debug("Query for '" + query + "'...");
@@ -59,27 +59,27 @@ public class AssignmentApplication {
 			if (results.getHits() > 0) {
 				log.debug("Hits found for " + query);
 				resultSet.insertData(app.getType(), query, results.getQueryTime());
-			}else{
+			} else {
 				log.debug("Not hits found for " + query);
 			}
 
 		}
 	}
 
-	private static void indexMetrics(SearchAppliance app) {
+	static void indexMetrics(SearchAppliance app) {
 		int size = Metrics.getFolderSizeOnDisk(new File(app.getIndexPath()));
 		int docs = Metrics.getDocumentCount(new File(app.getFileStore()));
 		log.debug(app.getType() + " Index currently residing within " + size + " bytes on disk.");
 		log.debug(app.getType() + " Index stores " + docs + " documents.");
 	}
 
-	private static void createIndex(SearchAppliance app) throws IOException {
+	static void createIndex(SearchAppliance app) throws IOException {
 		log.debug("Creating " + app.getType() + " Index...");
 		app.setIndexPath(app.getType() + File.separator + "index");
 		app.createIndex();
 		log.debug("Index " + app.getType() + " Index Created.");
 	}
 
-	private static final String STD_ANALYZER = "StandardAnalyzer";
-	private static final String ENG_ANALYZER = "EnglishAnalyzer";
+	static final String STD_ANALYZER = "StandardAnalyzer";
+	static final String ENG_ANALYZER = "EnglishAnalyzer";
 }

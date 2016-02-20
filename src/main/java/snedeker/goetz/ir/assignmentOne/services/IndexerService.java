@@ -99,8 +99,10 @@ public class IndexerService {
 	private ArrayList<EntryDocument> loadTexts() throws IOException {
 		ArrayList<EntryDocument> texts = new ArrayList<>();
 
-		InputStream stream = IndexerService.class.getClassLoader().getResourceAsStream("cran.all");
-		String text = IOUtils.toString(stream);
+		String text = "";
+		try (InputStream stream = IndexerService.class.getClassLoader().getResourceAsStream("cran.all")) {
+			text = IOUtils.toString(stream);
+		}
 
 		// Split into docs
 		String[] splitDocs = text.split(".I");

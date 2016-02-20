@@ -7,7 +7,7 @@ public class QueryResults {
 
 	Integer hits = null;
 	Long queryTime = null;
-	Map<String, Integer> resultsMap = null;
+	Map<Integer, String> resultsMap = null;
 
 	public Integer getHits() {
 		if (hits == null) {
@@ -15,11 +15,11 @@ public class QueryResults {
 		}
 		return hits;
 	}
-	
-	public void add(EntryDocument document){
+
+	public void add(EntryDocument document) {
 		setHits(getHits() + 1);
 		setQueryTime(-1L);
-		getResultsMap().put(document.getTitle(), document.getDocId());
+		getResultsMap().put(document.getDocId(), document.getTitle());
 	}
 
 	public void setHits(Integer hits) {
@@ -37,14 +37,14 @@ public class QueryResults {
 		this.queryTime = queryTime;
 	}
 
-	public Map<String, Integer> getResultsMap() {
+	public Map<Integer, String> getResultsMap() {
 		if (resultsMap == null) {
 			resultsMap = new HashMap<>();
 		}
 		return resultsMap;
 	}
 
-	public void setResultsMap(Map<String, Integer> resultsMap) {
+	public void setResultsMap(Map<Integer, String> resultsMap) {
 		this.resultsMap = resultsMap;
 	}
 
