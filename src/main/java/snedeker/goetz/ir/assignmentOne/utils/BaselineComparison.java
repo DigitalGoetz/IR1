@@ -10,10 +10,10 @@ import org.apache.log4j.Logger;
 public class BaselineComparison {
 
 	Logger log = Logger.getLogger(getClass());
-	SetType type;
+	DataSource type;
 	BaselineData data;
 
-	public BaselineComparison(SetType type) {
+	public BaselineComparison(DataSource type) {
 		this.type = type;
 		data = new BaselineData();
 		init();
@@ -27,7 +27,7 @@ public class BaselineComparison {
 
 	private String getBaselinefilename() {
 		StringBuilder sb = new StringBuilder();
-		if (type == SetType.CRAN) {
+		if (type == DataSource.CRAN) {
 			sb.append("cran");
 		} else {
 			sb.append("med");
@@ -44,27 +44,29 @@ public class BaselineComparison {
 
 		log.debug("Reading baseline information from " + filename);
 
+		List<String> lines = null;
 		try (InputStream is = BaselineComparison.class.getClassLoader().getResourceAsStream(filename)) {
-			List<String> lines = IOUtils.readLines(is);
-
-			for (String string : lines) {
-
-				if (!string.isEmpty()) {
-					String[] columns = string.split(" ");
-
-					try {
-						Integer queryId = Integer.parseInt(columns[0].trim());
-						Integer documentId = Integer.parseInt(columns[1].trim());
-
-						data.insert(queryId, documentId);
-					} catch (NumberFormatException e) {
-						log.error("NFE");
-					}
-
-				}
-			}
+			lines = IOUtils.readLines(is);
 		} catch (IOException e) {
 			log.error("Error reading baseline file", e);
 		}
+
+		for (String string : lines) {
+
+			if (!string.isEmpty()) {
+				String[] columns = string.split(" ");
+
+				try {
+					Integer queryId = Integer.parseInt(columns[0].trim());
+					Integer documentId = Integer.parseInt(columns[1].trim());
+
+					data.insert(queryId, documentId);
+				} catch (NumberFormatException e) {
+					log.error("NFE");
+				}
+
+			}
+		}
+
 	}
 }

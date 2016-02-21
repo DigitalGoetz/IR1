@@ -1,5 +1,5 @@
 package snedeker.goetz.ir.assignmentOne.utils;
 
-public enum SetType {
+public enum DataSource {
 	MED, CRAN;
 }

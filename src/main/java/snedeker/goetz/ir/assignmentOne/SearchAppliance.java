@@ -12,6 +12,7 @@ import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.services.IndexerService;
 import snedeker.goetz.ir.assignmentOne.services.QueryService;
 import snedeker.goetz.ir.assignmentOne.utils.Metrics;
+import snedeker.goetz.ir.assignmentOne.utils.DataSource;
 
 public class SearchAppliance {
 
@@ -23,9 +24,9 @@ public class SearchAppliance {
 	private String indexPath = "index";
 	private String type;
 
-	public SearchAppliance(String type) throws IOException {
+	public SearchAppliance(String type, DataSource source) throws IOException {
 		this.type = type;
-		indexerService = new IndexerService(type);
+		indexerService = new IndexerService(type, source);
 		queryService = new QueryService(type);
 	}
 
@@ -37,6 +38,12 @@ public class SearchAppliance {
 	public void createIndex() throws IOException {
 		indexerService.createIndex();
 		setIndexSize(Metrics.getFolderSizeOnDisk(new File(indexPath)));
+	}
+
+	public void releaseIndex() throws IOException {
+		indexerService.releaseIndex();
+		queryService.releaseIndex();
+		FileUtils.deleteDirectory(new File(getIndexPath()));
 	}
 
 	public QueryResults performQuery(String query) throws IOException {

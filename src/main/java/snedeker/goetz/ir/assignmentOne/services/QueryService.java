@@ -31,6 +31,10 @@ public class QueryService {
 		this.type = type;
 	}
 
+	public void releaseIndex() throws IOException {
+		index.close();
+	}
+
 	public QueryResults query(String queryString) throws IOException {
 		QueryResults results = new QueryResults();
 		File indexDirectory = new File(type + File.separator + "index");
@@ -70,6 +74,7 @@ public class QueryService {
 					}
 
 				}
+
 			}
 
 		} catch (IOException e) {

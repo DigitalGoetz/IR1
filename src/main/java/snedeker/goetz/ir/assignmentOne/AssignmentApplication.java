@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 
 import snedeker.goetz.ir.assignmentOne.models.QueryResults;
+import snedeker.goetz.ir.assignmentOne.utils.DataSource;
 import snedeker.goetz.ir.assignmentOne.utils.LuceneResults;
 
 import snedeker.goetz.ir.assignmentOne.utils.Metrics;
@@ -29,7 +30,7 @@ public class AssignmentApplication {
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 
-		SearchAppliance standardAnalyzerSearch = new SearchAppliance(STD_ANALYZER);
+		SearchAppliance standardAnalyzerSearch = new SearchAppliance(STD_ANALYZER, DataSource.CRAN);
 		clean(standardAnalyzerSearch);
 		createIndex(standardAnalyzerSearch);
 		indexMetrics(standardAnalyzerSearch);
@@ -38,7 +39,7 @@ public class AssignmentApplication {
 		String retrieveDocument = standardAnalyzerSearch.retrieveDocument(1);
 		log.debug(retrieveDocument);
 
-		SearchAppliance englishAnalyzerSearch = new SearchAppliance(ENG_ANALYZER);
+		SearchAppliance englishAnalyzerSearch = new SearchAppliance(ENG_ANALYZER, DataSource.CRAN);
 		clean(englishAnalyzerSearch);
 		englishAnalyzerSearch.setAnalyzer(new EnglishAnalyzer());
 		createIndex(englishAnalyzerSearch);
@@ -78,6 +79,10 @@ public class AssignmentApplication {
 		app.setIndexPath(app.getType() + File.separator + "index");
 		app.createIndex();
 		log.debug("Index " + app.getType() + " Index Created.");
+	}
+
+	static void releaseIndex(SearchAppliance app) throws IOException {
+		app.releaseIndex();
 	}
 
 	static final String STD_ANALYZER = "StandardAnalyzer";

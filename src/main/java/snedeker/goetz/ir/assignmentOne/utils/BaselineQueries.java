@@ -16,10 +16,10 @@ import snedeker.goetz.ir.assignmentOne.services.IndexerService;
 public class BaselineQueries {
 
 	Logger log = Logger.getLogger(getClass());
-	SetType type;
+	DataSource type;
 	Map<Integer, String> queries;
 
-	public BaselineQueries(SetType type) {
+	public BaselineQueries(DataSource type) {
 		this.type = type;
 		queries = new HashMap<>();
 		init();
@@ -38,7 +38,7 @@ public class BaselineQueries {
 
 	private String getBaselineQueryfilename() {
 		StringBuilder sb = new StringBuilder();
-		if (type == SetType.CRAN) {
+		if (type == DataSource.CRAN) {
 			sb.append("cran");
 		} else {
 			sb.append("med");

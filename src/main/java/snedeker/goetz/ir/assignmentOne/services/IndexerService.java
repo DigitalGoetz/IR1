@@ -30,6 +30,7 @@ import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
 
 import snedeker.goetz.ir.assignmentOne.models.EntryDocument;
+import snedeker.goetz.ir.assignmentOne.utils.DataSource;
 import snedeker.goetz.ir.assignmentOne.utils.LuceneUtilities;
 
 public class IndexerService {
@@ -39,9 +40,15 @@ public class IndexerService {
 	String fileStorePath;
 	Directory index;
 	String type;
+	DataSource source;
 
-	public IndexerService(String type) {
+	public IndexerService(String type, DataSource source) {
 		this.type = type;
+		this.source = source; 
+	}
+
+	public void releaseIndex() throws IOException {
+		index.close();
 	}
 
 	public Analyzer getAnalyzer() {
@@ -56,8 +63,8 @@ public class IndexerService {
 		File indexDirectory = new File(type + File.separator + "index");
 
 		if (indexDirectory.exists()) {
-			log.debug("Index Directory exists.  Clearing directory...");
 			FileUtils.deleteDirectory(indexDirectory);
+
 		}
 
 		Path path = indexDirectory.toPath();
@@ -99,8 +106,17 @@ public class IndexerService {
 	private ArrayList<EntryDocument> loadTexts() throws IOException {
 		ArrayList<EntryDocument> texts = new ArrayList<>();
 
+		String sourceString = "";
+		if (source == DataSource.CRAN) {
+			sourceString += "cran";
+		} else {
+			sourceString += "med";
+		}
+		sourceString += ".all";
+
 		String text = "";
-		try (InputStream stream = IndexerService.class.getClassLoader().getResourceAsStream("cran.all")) {
+
+		try (InputStream stream = IndexerService.class.getClassLoader().getResourceAsStream(sourceString)) {
 			text = IOUtils.toString(stream);
 		}
 
