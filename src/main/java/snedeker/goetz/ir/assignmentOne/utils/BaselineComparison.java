@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
@@ -42,8 +44,6 @@ public class BaselineComparison {
 		// Load in the baseline details for the particular dataset
 		String filename = getBaselinefilename();
 
-		log.debug("Reading baseline information from " + filename);
-
 		List<String> lines = null;
 		try (InputStream is = BaselineComparison.class.getClassLoader().getResourceAsStream(filename)) {
 			lines = IOUtils.readLines(is);
@@ -54,12 +54,11 @@ public class BaselineComparison {
 		for (String string : lines) {
 
 			if (!string.isEmpty()) {
-				String[] columns = string.split(" ");
+				StringTokenizer t = new StringTokenizer(string);
 
 				try {
-					Integer queryId = Integer.parseInt(columns[0].trim());
-					Integer documentId = Integer.parseInt(columns[1].trim());
-
+					Integer queryId = Integer.parseInt(t.nextToken());
+					Integer documentId = Integer.parseInt(t.nextToken());
 					data.insert(queryId, documentId);
 				} catch (NumberFormatException e) {
 					log.error("NFE");

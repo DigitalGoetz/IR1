@@ -1,9 +1,22 @@
 package snedeker.goetz.ir.assignmentOne.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.SlowCompositeReaderWrapper;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.index.Terms;
+import org.apache.lucene.index.TermsEnum;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
+
+import snedeker.goetz.ir.assignmentOne.SearchAppliance;
 
 public class Metrics {
 
@@ -39,16 +52,26 @@ public class Metrics {
 		return count;
 	}
 
-	public static void printIndexTerms(Map<String, Long> postings) {
-		int counter = 1;
-		for (String key : postings.keySet()) {
-			Long count = postings.get(key);
+	public static void printIndexTerms(SearchAppliance app) throws IOException {
 
-			if (count > 300) {
-				log.debug(counter + " Term: " + key + " contains " + count + " occurrences within the index");
-				counter++;
+		File indexDirectory = new File(app.getType() + app.getIndexId() + File.separator + "index");
+		Directory directory = FSDirectory.open(indexDirectory.toPath());
+		IndexReader reader = DirectoryReader.open(directory);
+
+		Terms terms = SlowCompositeReaderWrapper.wrap(reader).terms("content");
+
+		log.debug("printing...");
+		TermsEnum iterator = terms.iterator();
+		BytesRef next = iterator.next();
+
+		while (next != null) {
+			long freq = reader.totalTermFreq(new Term("content", next));
+			if (freq > 200) {
+				log.debug(next.utf8ToString() + ": " + freq);
 			}
-
+			next = iterator.next();
 		}
+
+		log.debug("done");
 	}
 }

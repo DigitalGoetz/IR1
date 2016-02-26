@@ -68,8 +68,7 @@ public class IndexerService {
 		index = FSDirectory.open(path);
 
 		setFileStorePath(type + indexId + File.separator + "documents");
-		Map<String, Long> postings = new HashMap<>();
-
+		
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
 		config.setOpenMode(OpenMode.CREATE_OR_APPEND);
 
@@ -78,20 +77,6 @@ public class IndexerService {
 		try (IndexWriter w = new IndexWriter(index, config)) {
 			for (EntryDocument entry : texts) {
 				addDoc(w, entry);
-			}
-
-			// Obtain details regarding the index here
-			IndexReader reader = DirectoryReader.open(w, false);
-			Fields fields = MultiFields.getFields(reader);
-			for (String field : fields) {
-				Terms terms = fields.terms(field);
-				TermsEnum iterator = terms.iterator();
-				BytesRef byteRef = null;
-				while ((byteRef = iterator.next()) != null) {
-					String term = byteRef.utf8ToString();
-					postings.put(term, new Long(iterator.totalTermFreq()));
-				}
-
 			}
 		}
 

@@ -1,4 +1,5 @@
 /target/
 /StandardAnalyzer*
 /EnglishAnalyzer*
+/Custom*
 informationRetrieval.log

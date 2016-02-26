@@ -3,11 +3,17 @@ package snedeker.goetz.ir.assignmentOne;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.CharArraySet;
 
 import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.services.IndexerService;
@@ -25,12 +31,56 @@ public class SearchAppliance {
 	private String indexPath = "index";
 	private String type;
 	private String indexId;
+	private DataSource source;
 
-	public SearchAppliance(String type, DataSource source) throws IOException {
+	public String getIndexId() {
+		return indexId;
+	}
+
+	public SearchAppliance(String type, DataSource source, List<String> additionalStopwords) throws IOException {
 		this.type = type;
+		this.source = source;
 		indexId = UUID.randomUUID().toString();
+
 		indexerService = new IndexerService(type, source, indexId);
 		queryService = new QueryService(type, indexId);
+
+		if (type.equals(AssignmentApplication.ENG_ANALYZER)) {
+			this.setAnalyzer(new EnglishAnalyzer());
+		}
+		if (type.equals(AssignmentApplication.CUSTOM_STD_ANALYZER)) {
+			if (additionalStopwords == null) {
+				additionalStopwords = new ArrayList<>();
+			}
+
+			List<String> stopwords = new ArrayList<String>();
+
+			for (Object word : StandardAnalyzer.STOP_WORDS_SET) {
+				char[] stopword = (char[]) word;
+				stopwords.add(new String(stopword));
+			}
+
+			for (String word : additionalStopwords) {
+				stopwords.add(word.toLowerCase());
+			}
+
+			CharArraySet stopwordArray = new CharArraySet(stopwords, true);
+			Analyzer custom = new StandardAnalyzer(stopwordArray);
+			this.setAnalyzer(custom);
+		}
+
+	}
+
+	public IndexerService getIndexer() {
+		return indexerService;
+	}
+
+	public QueryService getQueryHandler() {
+		return queryService;
+	}
+
+	public DataSource getSource() {
+		return source;
 	}
 
 	public void setAnalyzer(Analyzer analyzer) {
@@ -90,7 +140,7 @@ public class SearchAppliance {
 	}
 
 	public String getFileStore() {
-		return type + File.separator + "documents";
+		return type + indexId + File.separator + "documents";
 	}
 
 }

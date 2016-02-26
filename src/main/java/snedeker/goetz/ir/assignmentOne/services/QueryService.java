@@ -11,10 +11,13 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.spans.SpanQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -25,7 +28,7 @@ public class QueryService {
 	Logger log = Logger.getLogger(getClass());
 	Analyzer analyzer = new StandardAnalyzer();
 	String type;
-	String indexId; 
+	String indexId;
 	Directory index;
 
 	public QueryService(String type, String indexId) {
@@ -43,8 +46,9 @@ public class QueryService {
 			Query q = null;
 
 			try {
-				q = new QueryParser("content", analyzer).parse(queryString);
-			} catch (ParseException e) {
+				q = new StandardQueryParser(analyzer).parse(QueryParser.escape(queryString), "content");
+
+			} catch (QueryNodeException e) {
 				log.debug("Error parsing: " + queryString, e);
 			}
 
