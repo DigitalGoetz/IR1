@@ -2,6 +2,8 @@ package snedeker.goetz.ir.assignmentOne;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -19,7 +21,11 @@ public class AssignmentApplication {
 
 	static Logger log = Logger.getLogger(AssignmentApplication.class);
 
-	static String[] queries = { "test", "properties", "slipstream", "sample", "experiment" };
+	static String[] queries = { "test", "properties", "slipstream", "sample", "experiment", "human response",
+			"blood test results", "detailed data", "rate differences", "USAF", "body of evidence", "installing windows",
+			"velocity ratios", "neonatal hepatitis", "emission spectrograph", "dissolved protein",
+			"pairs of genetic traits", "effect of radiation", "consistent pathologic changes", "growth hormone",
+			"absence of insulin", "pneumoniae infection", "relative length", "increased free water", "size and shape" };
 
 	static LuceneResults resultSet = new LuceneResults();
 
@@ -40,6 +46,83 @@ public class AssignmentApplication {
 		indexMetrics(englishAnalyzerSearch);
 		performQueries(englishAnalyzerSearch);
 
+		List<String> stopwords = new ArrayList<>();
+		stopwords.add("after");
+		stopwords.add("has");
+		stopwords.add("been");
+		stopwords.add("may");
+		stopwords.add("were");
+		stopwords.add("than");
+		stopwords.add("from");
+		stopwords.add("cells");
+		stopwords.add("patients");
+		stopwords.add("blood");
+		stopwords.add("have");
+		stopwords.add("which");
+		stopwords.add("growth");
+		stopwords.add("cases");
+		stopwords.add("during");
+		stopwords.add("normal");
+		stopwords.add("1");
+		stopwords.add("10");
+		stopwords.add("2");
+		stopwords.add("3");
+		stopwords.add("4");
+		stopwords.add("5");
+		stopwords.add("6");
+		stopwords.add("b");
+		stopwords.add("c");
+		stopwords.add("its");
+		stopwords.add("m");
+		stopwords.add("other");
+		stopwords.add("some");
+		stopwords.add("had");
+		stopwords.add("also");
+		stopwords.add("when");
+		stopwords.add("one");
+		stopwords.add("only");
+		stopwords.add("found");
+		stopwords.add("between");
+		stopwords.add("cell");
+		stopwords.add("children");
+		stopwords.add("treatment");
+		stopwords.add("all");
+		stopwords.add("changes");
+		stopwords.add("more");
+		stopwords.add("disease");
+		stopwords.add("dna");
+		stopwords.add("effect");
+		stopwords.add("hormone");
+		stopwords.add("human");
+		stopwords.add("increased");
+		stopwords.add("rats");
+		stopwords.add("results");
+		stopwords.add("two");
+		stopwords.add("can");
+		stopwords.add("most");
+		stopwords.add("per");
+		stopwords.add("both");
+		stopwords.add("increase");
+
+		stopwords.add("associated");
+		stopwords.add("body");
+		stopwords.add("case");
+		stopwords.add("day");
+		stopwords.add("days");
+		stopwords.add("who");
+		stopwords.add("type");
+		stopwords.add("three");
+
+		stopwords.add("differ");
+		stopwords.add("different");
+		stopwords.add("difference");
+		stopwords.add("differences");
+
+		SearchAppliance app = new SearchAppliance(AssignmentApplication.CUSTOM_STD_ANALYZER, DataSource.MED, stopwords);
+		createIndex(app);
+		indexMetrics(app);
+		performQueries(app);
+
 		String retrieveDocument = standardAnalyzerSearch.retrieveDocument(1);
 		log.debug(retrieveDocument);
 
@@ -48,7 +131,79 @@ public class AssignmentApplication {
 
 	public static void query() throws IOException {
 
-		SearchAppliance app = new SearchAppliance(AssignmentApplication.STD_ANALYZER, DataSource.CRAN, null);
+		List<String> stopwords = new ArrayList<>();
+		stopwords.add("after");
+		stopwords.add("has");
+		stopwords.add("been");
+		stopwords.add("may");
+		stopwords.add("were");
+		stopwords.add("than");
+		stopwords.add("from");
+		stopwords.add("cells");
+		stopwords.add("patients");
+		stopwords.add("blood");
+		stopwords.add("have");
+		stopwords.add("which");
+		stopwords.add("growth");
+		stopwords.add("cases");
+		stopwords.add("during");
+		stopwords.add("normal");
+		stopwords.add("1");
+		stopwords.add("10");
+		stopwords.add("2");
+		stopwords.add("3");
+		stopwords.add("4");
+		stopwords.add("5");
+		stopwords.add("6");
+		stopwords.add("b");
+		stopwords.add("c");
+		stopwords.add("its");
+		stopwords.add("m");
+		stopwords.add("other");
+		stopwords.add("some");
+		stopwords.add("had");
+		stopwords.add("also");
+		stopwords.add("when");
+		stopwords.add("one");
+		stopwords.add("only");
+		stopwords.add("found");
+		stopwords.add("between");
+		stopwords.add("cell");
+		stopwords.add("children");
+		stopwords.add("treatment");
+		stopwords.add("all");
+		stopwords.add("changes");
+		stopwords.add("more");
+		stopwords.add("disease");
+		stopwords.add("dna");
+		stopwords.add("effect");
+		stopwords.add("hormone");
+		stopwords.add("human");
+		stopwords.add("increased");
+		stopwords.add("rats");
+		stopwords.add("results");
+		stopwords.add("two");
+		stopwords.add("can");
+		stopwords.add("most");
+		stopwords.add("per");
+		stopwords.add("both");
+		stopwords.add("increase");
+
+		stopwords.add("associated");
+		stopwords.add("body");
+		stopwords.add("case");
+		stopwords.add("day");
+		stopwords.add("days");
+		stopwords.add("who");
+		stopwords.add("type");
+		stopwords.add("three");
+
+		stopwords.add("differ");
+		stopwords.add("different");
+		stopwords.add("difference");
+		stopwords.add("differences");
+
+		SearchAppliance app = new SearchAppliance(AssignmentApplication.CUSTOM_STD_ANALYZER, DataSource.MED, stopwords);
 		app.createIndex();
 
 		try (Scanner scanner = new Scanner(System.in)) {

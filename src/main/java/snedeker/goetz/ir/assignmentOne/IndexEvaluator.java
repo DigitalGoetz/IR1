@@ -1,5 +1,6 @@
 package snedeker.goetz.ir.assignmentOne;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.utils.BaselineComparison;
 import snedeker.goetz.ir.assignmentOne.utils.BaselineQueries;
 import snedeker.goetz.ir.assignmentOne.utils.DataSource;
+import snedeker.goetz.ir.assignmentOne.utils.Metrics;
 
 public class IndexEvaluator {
 
@@ -153,6 +155,12 @@ public class IndexEvaluator {
 		log.debug("English Analyzer against Medline Dataset: F1 = " + engMedf1);
 		log.debug("Custom Analyzer against Medline Dataset: F1 = " + customMedf1);
 
+		int size = Metrics.getDocumentCount(
+				new File(customApp.getType() + customApp.getIndexId() + File.separator + "documents"));
+		log.debug("Storing " + size + " documents");
+		long bytes = Metrics
+				.getFolderSizeOnDisk(new File(customApp.getType() + customApp.getIndexId() + File.separator + "index"));
+		log.debug("Storing " + size + " documents within " + bytes + "B");
 		// Metrics.printIndexTerms(customApp);
 	}
 

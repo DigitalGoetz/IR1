@@ -55,10 +55,11 @@ public class LuceneResults {
 
 			}
 
-			Double timeAboveAverage = sumDuration / new Integer(data.size()).doubleValue();
-
-			log.debug("Query for: " + query + " had " + fastestType + "leading by " + fastestTime + " which is "
-					+ timeAboveAverage.intValue() + "ms above average  ");
+			if (fastestType.equals("N/A")) {
+				log.debug("Query for: " + query + " had no results");
+			} else {
+				log.debug("Query for: " + query + " had " + fastestType + "leading at " + fastestTime + "ms");
+			}
 
 		}
 	}
