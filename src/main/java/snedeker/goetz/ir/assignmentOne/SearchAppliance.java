@@ -3,6 +3,7 @@ package snedeker.goetz.ir.assignmentOne;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -23,11 +24,13 @@ public class SearchAppliance {
 	private int indexSize = 0;
 	private String indexPath = "index";
 	private String type;
+	private String indexId;
 
 	public SearchAppliance(String type, DataSource source) throws IOException {
 		this.type = type;
-		indexerService = new IndexerService(type, source);
-		queryService = new QueryService(type);
+		indexId = UUID.randomUUID().toString();
+		indexerService = new IndexerService(type, source, indexId);
+		queryService = new QueryService(type, indexId);
 	}
 
 	public void setAnalyzer(Analyzer analyzer) {
@@ -40,12 +43,6 @@ public class SearchAppliance {
 		setIndexSize(Metrics.getFolderSizeOnDisk(new File(indexPath)));
 	}
 
-	public void releaseIndex() throws IOException {
-		indexerService.releaseIndex();
-		queryService.releaseIndex();
-		FileUtils.deleteDirectory(new File(getIndexPath()));
-	}
-
 	public QueryResults performQuery(String query) throws IOException {
 		return queryService.query(query);
 	}
@@ -55,7 +52,7 @@ public class SearchAppliance {
 		log.debug("Retriving document with ID = " + documentId);
 
 		long start = System.currentTimeMillis();
-		File file = new File(type + File.separator + "documents" + File.separator + documentId.toString());
+		File file = new File(type + indexId + File.separator + "documents" + File.separator + documentId.toString());
 
 		log.debug(file.getAbsolutePath().toString());
 

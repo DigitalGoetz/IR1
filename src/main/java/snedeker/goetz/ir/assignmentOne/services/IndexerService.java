@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -40,15 +39,13 @@ public class IndexerService {
 	String fileStorePath;
 	Directory index;
 	String type;
+	String indexId;
 	DataSource source;
 
-	public IndexerService(String type, DataSource source) {
+	public IndexerService(String type, DataSource source, String indexId) {
 		this.type = type;
-		this.source = source; 
-	}
-
-	public void releaseIndex() throws IOException {
-		index.close();
+		this.source = source;
+		this.indexId = indexId;
 	}
 
 	public Analyzer getAnalyzer() {
@@ -60,18 +57,17 @@ public class IndexerService {
 	}
 
 	public void createIndex() throws IOException {
-		File indexDirectory = new File(type + File.separator + "index");
+		File indexDirectory = new File(type + indexId + File.separator + "index");
 
 		if (indexDirectory.exists()) {
-			FileUtils.deleteDirectory(indexDirectory);
-
+			throw new IOException("Cannot create an index within an existing index directory.");
 		}
 
 		Path path = indexDirectory.toPath();
 		log.debug("Creating Index Directory at: " + path.toString());
 		index = FSDirectory.open(path);
 
-		setFileStorePath(type + File.separator + "documents");
+		setFileStorePath(type + indexId + File.separator + "documents");
 		Map<String, Long> postings = new HashMap<>();
 
 		IndexWriterConfig config = new IndexWriterConfig(analyzer);
@@ -125,7 +121,7 @@ public class IndexerService {
 
 		for (String doc : splitDocs) {
 			if (doc != null && !doc.isEmpty()) {
-				EntryDocument newEntry = EntryDocument.buildEntry(doc);
+				EntryDocument newEntry = EntryDocument.buildEntry(doc, source);
 				if (newEntry != null) {
 					LuceneUtilities.entryToFile(getFileStorePath(), newEntry);
 					texts.add(newEntry);

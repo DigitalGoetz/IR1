@@ -3,7 +3,6 @@ package snedeker.goetz.ir.assignmentOne;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 
@@ -22,16 +21,9 @@ public class AssignmentApplication {
 
 	static LuceneResults resultSet = new LuceneResults();
 
-	static void clean(SearchAppliance app) throws IOException {
-		FileUtils.deleteDirectory(new File(app.getType() + File.separator + "index"));
-		FileUtils.deleteDirectory(new File(app.getType() + File.separator + "documents"));
-		FileUtils.deleteDirectory(new File(app.getType()));
-	}
-
 	public static void main(String[] args) throws IOException, InterruptedException {
 
 		SearchAppliance standardAnalyzerSearch = new SearchAppliance(STD_ANALYZER, DataSource.CRAN);
-		clean(standardAnalyzerSearch);
 		createIndex(standardAnalyzerSearch);
 		indexMetrics(standardAnalyzerSearch);
 		performQueries(standardAnalyzerSearch);
@@ -40,7 +32,6 @@ public class AssignmentApplication {
 		log.debug(retrieveDocument);
 
 		SearchAppliance englishAnalyzerSearch = new SearchAppliance(ENG_ANALYZER, DataSource.CRAN);
-		clean(englishAnalyzerSearch);
 		englishAnalyzerSearch.setAnalyzer(new EnglishAnalyzer());
 		createIndex(englishAnalyzerSearch);
 		indexMetrics(englishAnalyzerSearch);
@@ -79,10 +70,6 @@ public class AssignmentApplication {
 		app.setIndexPath(app.getType() + File.separator + "index");
 		app.createIndex();
 		log.debug("Index " + app.getType() + " Index Created.");
-	}
-
-	static void releaseIndex(SearchAppliance app) throws IOException {
-		app.releaseIndex();
 	}
 
 	static final String STD_ANALYZER = "StandardAnalyzer";

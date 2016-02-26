@@ -3,6 +3,8 @@ package snedeker.goetz.ir.assignmentOne.models;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import snedeker.goetz.ir.assignmentOne.utils.DataSource;
+
 public class EntryDocument {
 
 	static Logger log = Logger.getLogger(EntryDocument.class);
@@ -13,10 +15,10 @@ public class EntryDocument {
 	private String author;
 	private String additional;
 
-	public static EntryDocument buildEntry(String documentString) {
+	public static EntryDocument buildEntry(String documentString, DataSource datasource) {
 		EntryDocument document = new EntryDocument();
 
-		try {
+		if (datasource == DataSource.MED) {
 			String[] docs = documentString.split(".I");
 
 			String doc;
@@ -27,32 +29,51 @@ public class EntryDocument {
 			}
 
 			// Get ID
-			String[] docId = doc.split(".T");
+			String[] docId = doc.split(".W");
 			document.setDocId(Integer.parseInt(StringUtils.trim(docId[0])));
+			document.setContents(docId[1]);
 
-			// get title
-			String[] title = docId[1].split(".A");
-			document.setTitle(StringUtils.trim(title[0]));
+		} else {
+			try {
+				String[] docs = documentString.split(".I");
 
-			// get author
-			String[] author = title[1].split(".B");
-			document.setAuthor(StringUtils.trim(author[0]));
+				String doc;
+				if (docs.length > 1) {
+					doc = docs[1];
+				} else {
+					doc = docs[0];
+				}
 
-			// get additional
-			String[] additional = author[1].split(".W");
-			document.setAdditional(StringUtils.trim(additional[0]));
+				// Get ID
+				String[] docId = doc.split(".T");
+				document.setDocId(Integer.parseInt(StringUtils.trim(docId[0])));
 
-			// get contents
-			document.setContents(StringUtils.trim(additional[1]));
-		} catch (Exception e) {
-			log.error("Error building EntryDocument", e);
-			document = null;
+				// get title
+				String[] title = docId[1].split(".A");
+				document.setTitle(StringUtils.trim(title[0]));
+
+				// get author
+				String[] author = title[1].split(".B");
+				document.setAuthor(StringUtils.trim(author[0]));
+
+				// get additional
+				String[] additional = author[1].split(".W");
+				document.setAdditional(StringUtils.trim(additional[0]));
+
+				// get contents
+				document.setContents(StringUtils.trim(additional[1]));
+			} catch (Exception e) {
+				log.error("Error building EntryDocument", e);
+				document = null;
+			}
 		}
-
 		return document;
 	}
 
 	public String getAdditional() {
+		if (additional == null) {
+			additional = "";
+		}
 		return additional;
 	}
 
@@ -61,6 +82,9 @@ public class EntryDocument {
 	}
 
 	public Integer getDocId() {
+		if (docId == null) {
+			docId = new Integer(0);
+		}
 		return docId;
 	}
 
@@ -69,6 +93,9 @@ public class EntryDocument {
 	}
 
 	public String getAuthor() {
+		if (author == null) {
+			author = "";
+		}
 		return author;
 	}
 
@@ -77,6 +104,9 @@ public class EntryDocument {
 	}
 
 	public String getTitle() {
+		if (title == null) {
+			title = "";
+		}
 		return title;
 	}
 
@@ -85,6 +115,9 @@ public class EntryDocument {
 	}
 
 	public String getContents() {
+		if (contents == null) {
+			contents = "";
+		}
 		return contents;
 	}
 

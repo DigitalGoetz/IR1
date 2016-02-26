@@ -25,24 +25,21 @@ public class QueryService {
 	Logger log = Logger.getLogger(getClass());
 	Analyzer analyzer = new StandardAnalyzer();
 	String type;
+	String indexId; 
 	Directory index;
 
-	public QueryService(String type) {
+	public QueryService(String type, String indexId) {
 		this.type = type;
-	}
-
-	public void releaseIndex() throws IOException {
-		index.close();
+		this.indexId = indexId;
 	}
 
 	public QueryResults query(String queryString) throws IOException {
 		QueryResults results = new QueryResults();
-		File indexDirectory = new File(type + File.separator + "index");
+		File indexDirectory = new File(type + indexId + File.separator + "index");
 		index = FSDirectory.open(indexDirectory.toPath());
 
 		try {
 			long start = System.currentTimeMillis();
-
 			Query q = null;
 
 			try {
@@ -58,11 +55,8 @@ public class QueryService {
 				TopDocs docs = searcher.search(q, hitsPerPage);
 
 				long finish = System.currentTimeMillis();
-
 				results.setQueryTime(finish - start);
-
 				ScoreDoc[] hits = docs.scoreDocs;
-
 				results.setHits(hits.length);
 
 				for (int i = 0; i < hits.length; ++i) {
@@ -72,11 +66,10 @@ public class QueryService {
 						Document d = searcher.doc(docId);
 						results.getResultsMap().put(docId, d.get("title"));
 					}
-
 				}
-
 			}
 
+			index.close();
 		} catch (IOException e) {
 			log.error("Error Reading from Index Directory", e);
 		}

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 
 import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.utils.BaselineComparison;
@@ -21,6 +22,10 @@ public class IndexEvaluator {
 		List<Double> f1Scores = new ArrayList<>();
 
 		SearchAppliance searchApp = new SearchAppliance(analyzer, source);
+		if (source == DataSource.MED) {
+			searchApp.setAnalyzer(new EnglishAnalyzer());
+		}
+
 		AssignmentApplication.createIndex(searchApp);
 		AssignmentApplication.indexMetrics(searchApp);
 
@@ -59,22 +64,23 @@ public class IndexEvaluator {
 		Double avg = scoreSum / new Integer(f1Scores.size()).doubleValue();
 		log.debug("Average F1 score against baseline set: " + avg);
 
-		AssignmentApplication.releaseIndex(searchApp);
-		
-		return 0.0;
+		return avg;
 	}
 
 	public static void main(String[] args) throws IOException {
-		Double stdCran = evaluate(DataSource.CRAN, AssignmentApplication.STD_ANALYZER);
-		Double engCran = evaluate(DataSource.CRAN, AssignmentApplication.ENG_ANALYZER);
+		// Double stdCran = evaluate(DataSource.CRAN,
+		// AssignmentApplication.STD_ANALYZER);
+		// Double engCran = evaluate(DataSource.CRAN,
+		// AssignmentApplication.ENG_ANALYZER);
 		Double stdMed = evaluate(DataSource.MED, AssignmentApplication.STD_ANALYZER);
 		Double engMed = evaluate(DataSource.MED, AssignmentApplication.ENG_ANALYZER);
-		
-		
-		log.debug("Standard Analyzer against Cranfield Dataset: F1 = " + stdCran );
-		log.debug("English Analyzer against Cranfield Dataset: F1 = " + engCran );
-		log.debug("Standard Analyzer against Medline Dataset: F1 = " + stdMed );
-		log.debug("English Analyzer against Medline Dataset: F1 = " + engMed );
+
+		// log.debug("Standard Analyzer against Cranfield Dataset: F1 = " +
+		// stdCran);
+		// log.debug("English Analyzer against Cranfield Dataset: F1 = " +
+		// engCran);
+		log.debug("Standard Analyzer against Medline Dataset: F1 = " + stdMed);
+		log.debug("English Analyzer against Medline Dataset: F1 = " + engMed);
 	}
 
 	private static Double getF1(List<Integer> obtained, List<Integer> expected) {
