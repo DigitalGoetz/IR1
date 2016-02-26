@@ -2,8 +2,6 @@ package snedeker.goetz.ir.assignmentOne.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -11,7 +9,6 @@ import org.apache.lucene.index.SlowCompositeReaderWrapper;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.Terms;
 import org.apache.lucene.index.TermsEnum;
-import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
@@ -60,7 +57,6 @@ public class Metrics {
 
 		Terms terms = SlowCompositeReaderWrapper.wrap(reader).terms("content");
 
-		log.debug("printing...");
 		TermsEnum iterator = terms.iterator();
 		BytesRef next = iterator.next();
 
@@ -72,6 +68,5 @@ public class Metrics {
 			next = iterator.next();
 		}
 
-		log.debug("done");
 	}
 }

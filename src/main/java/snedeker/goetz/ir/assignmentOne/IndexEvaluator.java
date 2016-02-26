@@ -11,7 +11,6 @@ import snedeker.goetz.ir.assignmentOne.models.QueryResults;
 import snedeker.goetz.ir.assignmentOne.utils.BaselineComparison;
 import snedeker.goetz.ir.assignmentOne.utils.BaselineQueries;
 import snedeker.goetz.ir.assignmentOne.utils.DataSource;
-import snedeker.goetz.ir.assignmentOne.utils.Metrics;
 
 public class IndexEvaluator {
 
@@ -154,7 +153,7 @@ public class IndexEvaluator {
 		log.debug("English Analyzer against Medline Dataset: F1 = " + engMedf1);
 		log.debug("Custom Analyzer against Medline Dataset: F1 = " + customMedf1);
 
-		Metrics.printIndexTerms(customApp);
+		// Metrics.printIndexTerms(customApp);
 	}
 
 	private Double getF1(List<Integer> obtained, List<Integer> expected) {

@@ -47,7 +47,7 @@ public class AssignmentApplication {
 	}
 
 	public static void query() throws IOException {
-		// Build app
+
 		SearchAppliance app = new SearchAppliance(AssignmentApplication.STD_ANALYZER, DataSource.CRAN, null);
 		app.createIndex();
 
@@ -56,13 +56,13 @@ public class AssignmentApplication {
 			boolean active = true;
 			while (active) {
 				System.out.println(
-						"Query or Retrieve documents from the index (prefix queries with \"q \" and retrievals with \"d \")");
+						"Query or Retrieve documents from the index (prefix queries with \"q \" and retrievals with \"d \"). x to exit");
 				String line = scanner.nextLine();
 				if (line.startsWith("d ")) {
 					System.out.println("Performing Document Retrieval...");
 					String docIdString = line.substring(2).trim();
 					if (StringUtils.isNumeric(docIdString)) {
-						String documentString = app.retrieveDocument(Integer.parseInt(docIdString));
+						String documentString = app.retrieveDocument(Integer.parseInt(docIdString) + 1);
 						System.out.println(documentString.isEmpty() ? "<Empty>" : documentString);
 						continue;
 					} else {
@@ -86,7 +86,11 @@ public class AssignmentApplication {
 					System.out.println("Found " + results.getHits() + " in " + results.getQueryTime() + "ms");
 					continue;
 
+				} else if (line.equals("x")) {
+					System.out.println("Exitting...");
+					System.exit(0);
 				} else {
+
 					System.out.println("Invalid syntax");
 				}
 
@@ -96,10 +100,6 @@ public class AssignmentApplication {
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-
-		for (String string : args) {
-			System.out.println(string);
-		}
 
 		if (args.length < 1) {
 			log.error("Application must obtain at least 1 cmd line arg");
@@ -148,10 +148,10 @@ public class AssignmentApplication {
 	}
 
 	static void createIndex(SearchAppliance app) throws IOException {
-		// log.debug("Creating " + app.getType() + " Index...");
+		log.debug("Creating " + app.getType() + " Index...");
 		app.setIndexPath(app.getType() + app.getIndexId() + File.separator + "index");
 		app.createIndex();
-		// log.debug("Index " + app.getType() + " Index Created.");
+		log.debug("Index " + app.getType() + " Index Created.");
 	}
 
 	static final String STD_ANALYZER = "StandardAnalyzer";
